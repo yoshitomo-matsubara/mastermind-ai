@@ -18,7 +18,7 @@ public class Player {
         this.time = 0;
     }
 
-    private State searchNaively(List<State> stateList) {
+    public State searchNaively(List<State> stateList) {
         if(stateList.size() == 0) {
             int[] elements = new int[this.positionSize];
             for (int i = 0;i < elements.length;i++) {
@@ -41,7 +41,7 @@ public class Player {
         return new State(elements, this.positionSize);
     }
 
-    private State search(List<State> stateList, List<Pegs> pegsList) {
+    public State search(List<State> stateList, List<Pegs> pegsList) {
         return searchNaively(stateList);
     }
 
