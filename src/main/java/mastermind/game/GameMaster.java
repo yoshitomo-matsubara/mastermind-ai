@@ -26,7 +26,7 @@ public class GameMaster {
         return pegs.rwe[0] == positionSize && pegs.rwe[1] == 0 && pegs.rwe[2] == 0;
     }
 
-    public static void start(int colorSize, int positionSize) {
+    public static void start(int colorSize, int positionSize, int[] answerElements) {
         State goalState = MiscUtil.generateGoalState(colorSize, positionSize);
         Player player = new Player(goalState);
         player.play();
@@ -36,12 +36,21 @@ public class GameMaster {
         CommandLine cl = MiscUtil.setCommandLine(args);
         int colorSize = Integer.parseInt(cl.getOptionValue(Config.COLOR_SIZE_OPTION));
         int positionSize = Integer.parseInt(cl.getOptionValue(Config.POSITION_SIZE_OPTION));
-        if (colorSize < 1 || positionSize < 1)
+        int[] answerElements = cl.hasOption(Config.ANSWER_OPTION) ?
+                MiscUtil.convertToArray(cl.getOptionValue(Config.ANSWER_OPTION)) : null;
+        if (colorSize < 1 || positionSize < 1) {
+            System.out.println("Both numbers of colors and positions must be 1 or greater.");
             return;
+        }
+
+        if (answerElements != null && !MiscUtil.checkIfValidAnswer(answerElements, colorSize, positionSize)) {
+            System.out.println("Given answer does not meet the requirements of both numbers of colors and positions.");
+            return;
+        }
 
         System.out.println("##############################");
         System.out.println("  Mastermind Game Simulation");
         System.out.println("##############################\n");
-        start(colorSize, positionSize);
+        start(colorSize, positionSize, answerElements);
     }
 }
