@@ -27,7 +27,8 @@ public class GameMaster {
     }
 
     public static void start(int colorSize, int positionSize, int[] answerElements) {
-        State goalState = MiscUtil.generateGoalState(colorSize, positionSize);
+        State goalState = (answerElements == null) ? MiscUtil.generateGoalState(colorSize, positionSize)
+                : new State(answerElements, colorSize);
         Player player = new Player(goalState);
         player.play();
     }

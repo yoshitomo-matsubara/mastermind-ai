@@ -47,6 +47,15 @@ public class MiscUtil {
     }
 
     public static boolean checkIfValidAnswer(int[] answerElements, int colorSize, int positionSize) {
+        if (answerElements.length != positionSize) {
+            return false;
+        }
+
+        for (int element : answerElements) {
+            if (element < 0 || element >= colorSize) {
+                return false;
+            }
+        }
         return true;
     }
 

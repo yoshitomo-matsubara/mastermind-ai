@@ -5,7 +5,10 @@
 - IntelliJ IDEA
 
 ## Usage
-    $ java -classpath mastermind-ai.jar mastermind.game.GameMaster -c <# of colors> -p <# of positions>` 
+    $ java -classpath mastermind-ai.jar mastermind.game.GameMaster -c <*# of colors*> -p <*# of positions*> [-a <*answer*>]` 
+- *# of colors* must be 1 or greater
+- *# of positions* must be 1 or greater
+- [optional] *answer* is delimited with comma (e.g. 0,1,2,3)
     
 ## How to add a new player (strategy)
 1. create a new class file on **mastermind.ai** (e.g. PlayerA)
