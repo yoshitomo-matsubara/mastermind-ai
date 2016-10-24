@@ -20,6 +20,7 @@ public class PlayerA extends Player {
     }
     
     private State searchA(List<State> stateList, List<Pegs> pegsList) {
+        ...
         return new State(~~~);
     }
 
