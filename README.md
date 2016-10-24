@@ -5,7 +5,7 @@
 - IntelliJ IDEA
 
 ## Usage
-    $ java -classpath mastermind-ai.jar mastermind.game.GameMaster -c <*# of colors*> -p <*# of positions*> [-a <*answer*>]` 
+    $ java -classpath mastermind-ai.jar mastermind.game.GameMaster -c <# of colors> -p <# of positions> [-a <answer>]` 
 - *# of colors* must be 1 or greater
 - *# of positions* must be 1 or greater
 - [optional] *answer* is delimited with comma (e.g. 0,1,2,3)
