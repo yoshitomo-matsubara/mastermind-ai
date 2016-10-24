@@ -10,8 +10,7 @@ public class MiscUtil {
         CommandLine cl = null;
         try {
             cl = clp.parse(options, args);
-        }
-        catch (ParseException pe) {
+        } catch (ParseException pe) {
             pe.printStackTrace();
         }
         return cl;
@@ -35,7 +34,7 @@ public class MiscUtil {
     public static State generateGoalState(int colorSize, int positionSize) {
         int[] elements = new int[positionSize];
         Random rand = new Random();
-        for (int i = 0;i < positionSize; i++) {
+        for (int i = 0; i < positionSize; i++) {
             elements[i] = rand.nextInt(colorSize);
         }
         return new State(elements, colorSize);
