@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-    private final State goalState;
-    private int colorSize, positionSize, time, preStateIdx;
-    private List<State> stateList;
-    private int[][] stateSpaceMat;
+    protected final State goalState;
+    protected int colorSize, positionSize, time, preStateIdx;
+    protected List<State> stateList;
+    protected int[][] stateSpaceMat;
 
     public Player(State goalState) {
         this.goalState = goalState;
@@ -23,7 +23,7 @@ public class Player {
         this.stateSpaceMat = MiscUtil.initStateSpaceMatrix(this.colorSize, this.positionSize);
     }
 
-    public State searchNaively() {
+    protected State searchNaively() {
         if (this.stateList.size() == 0) {
             int[] elements = new int[this.positionSize];
             for (int i = 0; i < elements.length; i++) {
@@ -47,7 +47,7 @@ public class Player {
         return new State(elements, this.positionSize);
     }
 
-    public State search() {
+    protected State search() {
         return searchNaively();
     }
 
