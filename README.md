@@ -19,13 +19,15 @@ public class PlayerA extends Player {
         super(goalState);
     }
     
-    private State searchA() {
+    protected State searchA() {
         ...
-        return new State(~~~);
+        State currentState = new State(~~~);
+        currentState.setPegs(GameMaster.evaluate(currentState, this.goalState));
+        return currentState;
     }
 
     @Override
-    public State search() {
+    protected State search() {
         return searchA();
     }
 }
