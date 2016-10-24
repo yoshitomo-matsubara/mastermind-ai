@@ -4,7 +4,7 @@ import mastermind.ai.Player;
 import org.apache.commons.cli.CommandLine;
 
 public class GameMaster {
-    public static Pegs evaluate(State state, State goalState) {
+    public static int[] evaluate(State state, State goalState) {
         int[] rwe = new int[]{0, 0, 0};
         for (int i = 0; i < state.elements.length; i++) {
             if (state.elements[i] == goalState.elements[i]) {
@@ -19,11 +19,11 @@ public class GameMaster {
         rwe[1] -= rwe[0];
         // empty
         rwe[2] = goalState.elements.length - rwe[1] - rwe[0];
-        return new Pegs(rwe);
+        return rwe;
     }
 
-    public static boolean checkIfGoalState(Pegs pegs, int positionSize) {
-        return pegs.rwe[0] == positionSize && pegs.rwe[1] == 0 && pegs.rwe[2] == 0;
+    public static boolean checkIfGoalState(State state, int positionSize) {
+        return state.pegs[0] == positionSize && state.pegs[1] == 0 && state.pegs[2] == 0;
     }
 
     public static void start(int colorSize, int positionSize, int[] answerElements) {

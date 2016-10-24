@@ -58,4 +58,14 @@ public class MiscUtil {
         }
         return new State(elements, colorSize);
     }
+
+    public static int[][] initStateSpaceMatrix(int colorSize, int positionSize) {
+        int[][] stateSpaceMat = new int[colorSize][positionSize];
+        for (int i = 0 ; i < stateSpaceMat.length ; i++) {
+            for (int j = 0 ; j < stateSpaceMat[0].length ; j++) {
+                stateSpaceMat[i][j] = Config.UNEXPLORED_VALUE;
+            }
+        }
+        return stateSpaceMat;
+    }
 }
