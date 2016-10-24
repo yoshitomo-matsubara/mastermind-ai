@@ -11,7 +11,8 @@ public class MiscUtil {
         try {
             cl = clp.parse(options, args);
         } catch (ParseException pe) {
-            pe.printStackTrace();
+            HelpFormatter help = new HelpFormatter();
+            help.printHelp("Mastermind AI", options, true);
         }
         return cl;
     }
@@ -28,7 +29,25 @@ public class MiscUtil {
                 .required(true)
                 .desc("number of positions")
                 .build());
+        options.addOption(Option.builder(Config.ANSWER_OPTION)
+                .hasArg(true)
+                .required(false)
+                .desc("[optional] ")
+                .build());
         return setParams(options, args);
+    }
+
+    public static int[] convertToArray(String answer) {
+        String[] elements = answer.split(",");
+        int[] answerElements = new int[elements.length];
+        for (int i = 0 ; i < elements.length ; i++) {
+            answerElements[i] = Integer.parseInt(elements[i]);
+        }
+        return answerElements;
+    }
+
+    public static boolean checkIfValidAnswer(int[] answerElements, int colorSize, int positionSize) {
+        return true;
     }
 
     public static State generateGoalState(int colorSize, int positionSize) {
@@ -38,5 +57,15 @@ public class MiscUtil {
             elements[i] = rand.nextInt(colorSize);
         }
         return new State(elements, colorSize);
+    }
+
+    public static int[][] initStateSpaceMatrix(int colorSize, int positionSize) {
+        int[][] stateSpaceMat = new int[colorSize][positionSize];
+        for (int i = 0 ; i < stateSpaceMat.length ; i++) {
+            for (int j = 0 ; j < stateSpaceMat[0].length ; j++) {
+                stateSpaceMat[i][j] = Config.UNEXPLORED_VALUE;
+            }
+        }
+        return stateSpaceMat;
     }
 }
