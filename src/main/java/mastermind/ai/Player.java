@@ -19,9 +19,9 @@ public class Player {
     }
 
     public State searchNaively(List<State> stateList) {
-        if(stateList.size() == 0) {
+        if (stateList.size() == 0) {
             int[] elements = new int[this.positionSize];
-            for (int i = 0;i < elements.length;i++) {
+            for (int i = 0; i < elements.length; i++) {
                 elements[i] = 0;
             }
             return new State(elements, this.colorSize);
@@ -30,8 +30,8 @@ public class Player {
         State preState = stateList.get(stateList.size() - 1);
         int[] elements = new int[preState.elements.length];
         boolean carryFlag = true;
-        for (int i = elements.length - 1;i >= 0;i--) {
-            int n = (carryFlag)? preState.elements[i] + 1 : preState.elements[i];
+        for (int i = elements.length - 1; i >= 0; i--) {
+            int n = (carryFlag) ? preState.elements[i] + 1 : preState.elements[i];
             carryFlag = n >= this.colorSize;
             if (carryFlag) {
                 n = 0;

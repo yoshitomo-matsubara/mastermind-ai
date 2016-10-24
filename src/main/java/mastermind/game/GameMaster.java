@@ -6,13 +6,13 @@ import org.apache.commons.cli.CommandLine;
 public class GameMaster {
     public static Pegs evaluate(State state, State goalState) {
         int[] rwe = new int[]{0, 0, 0};
-        for (int i = 0;i < state.elements.length;i++) {
+        for (int i = 0; i < state.elements.length; i++) {
             if (state.elements[i] == goalState.elements[i]) {
                 // red
                 rwe[0]++;
             }
         }
-        for (int i = 0;i < state.elements.length;i++) {
+        for (int i = 0; i < state.elements.length; i++) {
             rwe[1] += Math.min(state.colorSizes[i], goalState.colorSizes[i]);
         }
         // white

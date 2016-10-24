@@ -5,7 +5,7 @@ public class Pegs {
 
     public Pegs(int[] rwe) {
         this.rwe = new int[3];
-        for (int i = 0;i < 3;i++) {
+        for (int i = 0; i < 3; i++) {
             this.rwe[i] = rwe[i];
         }
     }
