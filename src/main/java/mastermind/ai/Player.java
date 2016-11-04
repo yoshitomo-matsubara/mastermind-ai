@@ -1,5 +1,6 @@
 package mastermind.ai;
 
+import mastermind.game.Config;
 import mastermind.game.GameMaster;
 import mastermind.game.MiscUtil;
 import mastermind.game.State;
@@ -23,6 +24,28 @@ public class Player {
         this.stateSpaceMat = MiscUtil.initStateSpaceMatrix(this.colorSize, this.positionSize);
     }
 
+    protected boolean invalidateDomRow(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= this.stateSpaceMat.length) {
+            return false;
+        }
+
+        for (int i = 0 ; i < this.stateSpaceMat.length ; i++) {
+            this.stateSpaceMat[rowIndex][i] = Config.FIXED_NON_ANSWER_VALUE;
+        }
+        return true;
+    }
+
+    protected boolean invalidateDomColumn(int columnIndex) {
+        if (columnIndex < 0 || columnIndex >= this.stateSpaceMat[0].length) {
+            return false;
+        }
+
+        for (int i = 0 ; i < this.stateSpaceMat[0].length ; i++) {
+            this.stateSpaceMat[i][columnIndex] = Config.FIXED_NON_ANSWER_VALUE;
+        }
+        return true;
+    }
+
     protected State searchNaively() {
         if (this.stateList.size() == 0) {
             int[] elements = new int[this.positionSize];
@@ -44,7 +67,7 @@ public class Player {
             }
             elements[i] = n;
         }
-        return new State(elements, this.positionSize);
+        return new State(elements, this.colorSize);
     }
 
     protected State search() {

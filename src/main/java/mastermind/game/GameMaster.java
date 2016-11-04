@@ -12,7 +12,8 @@ public class GameMaster {
                 rwe[0]++;
             }
         }
-        for (int i = 0; i < state.elements.length; i++) {
+
+        for (int i = 0; i < state.colorSizes.length; i++) {
             rwe[1] += Math.min(state.colorSizes[i], goalState.colorSizes[i]);
         }
         // white
