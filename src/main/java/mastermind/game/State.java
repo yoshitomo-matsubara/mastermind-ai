@@ -9,10 +9,8 @@ public class State {
         this.elements = new int[elements.length];
         this.colorSizes = new int[colorSize];
         this.pegs = new int[3];
-        for (int i = 0; i < elements.length; i++) {
-            this.elements[i] = elements[i];
-        }
         for (int i = 0; i < this.elements.length; i++) {
+            this.elements[i] = elements[i];
             this.colorSizes[this.elements[i]]++;
         }
     }
