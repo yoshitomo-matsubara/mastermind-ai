@@ -1,5 +1,6 @@
 package mastermind.game;
 
+import mastermind.ai.NaivePlayer;
 import mastermind.ai.Player;
 import org.apache.commons.cli.CommandLine;
 
@@ -27,10 +28,10 @@ public class GameMaster {
         return state.pegs[0] == positionSize && state.pegs[1] == 0 && state.pegs[2] == 0;
     }
 
-    public static void start(int colorSize, int positionSize, int[] answerElements) {
+    public static void start(int colorSize, int positionSize, String methodType, int[] answerElements) {
         State goalState = (answerElements == null) ? MiscUtil.generateGoalState(colorSize, positionSize)
                 : new State(answerElements, colorSize);
-        Player player = new Player(goalState);
+        Player player = new NaivePlayer(goalState);
         player.play();
     }
 
@@ -38,6 +39,7 @@ public class GameMaster {
         CommandLine cl = MiscUtil.setCommandLine(args);
         int colorSize = Integer.parseInt(cl.getOptionValue(Config.COLOR_SIZE_OPTION));
         int positionSize = Integer.parseInt(cl.getOptionValue(Config.POSITION_SIZE_OPTION));
+        String methodType = cl.hasOption(Config.METHOD_OPTION) ? cl.getOptionValue(Config.METHOD_OPTION) : null;
         int[] answerElements = cl.hasOption(Config.ANSWER_OPTION) ?
                 MiscUtil.convertToArray(cl.getOptionValue(Config.ANSWER_OPTION)) : null;
         if (colorSize < 1 || positionSize < 1) {
@@ -53,6 +55,6 @@ public class GameMaster {
         System.out.println("##############################");
         System.out.println("  Mastermind Game Simulation");
         System.out.println("##############################\n");
-        start(colorSize, positionSize, answerElements);
+        start(colorSize, positionSize, methodType, answerElements);
     }
 }

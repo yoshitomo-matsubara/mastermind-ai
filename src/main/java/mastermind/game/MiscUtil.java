@@ -29,10 +29,15 @@ public class MiscUtil {
                 .required(true)
                 .desc("number of positions")
                 .build());
+        options.addOption(Option.builder(Config.METHOD_OPTION)
+                .hasArg(true)
+                .required(false)
+                .desc("[optional] method")
+                .build());
         options.addOption(Option.builder(Config.ANSWER_OPTION)
                 .hasArg(true)
                 .required(false)
-                .desc("[optional] ")
+                .desc("[optional] answer")
                 .build());
         return setParams(options, args);
     }

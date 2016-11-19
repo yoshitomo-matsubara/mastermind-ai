@@ -8,7 +8,8 @@ import mastermind.game.State;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public abstract class Player {
+    public static final String TYPE = "abstract";
     protected final State goalState;
     protected int colorSize, positionSize, time, preStateIdx;
     protected List<State> stateList;
@@ -46,33 +47,7 @@ public class Player {
         return true;
     }
 
-    protected State searchNaively() {
-        if (this.stateList.size() == 0) {
-            int[] elements = new int[this.positionSize];
-            for (int i = 0; i < elements.length; i++) {
-                elements[i] = 0;
-            }
-            return new State(elements, this.colorSize);
-        }
-
-        this.preStateIdx = this.stateList.size() - 1;
-        State preState =  this.stateList.get(this.preStateIdx);
-        int[] elements = new int[preState.elements.length];
-        boolean carryFlag = true;
-        for (int i = elements.length - 1; i >= 0; i--) {
-            int n = (carryFlag) ? preState.elements[i] + 1 : preState.elements[i];
-            carryFlag = n >= this.colorSize;
-            if (carryFlag) {
-                n = 0;
-            }
-            elements[i] = n;
-        }
-        return new State(elements, this.colorSize);
-    }
-
-    protected State search() {
-        return searchNaively();
-    }
+    protected abstract State search();
 
     public void play() {
         while (true) {
