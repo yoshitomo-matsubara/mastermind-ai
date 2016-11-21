@@ -73,6 +73,30 @@ public class MiscUtil {
         return new State(elements, colorSize);
     }
 
+    public static int[] initArray(int arraySize, int initValue) {
+        int[] array = new int[arraySize];
+        for (int i = 0 ; i < array.length ; i++) {
+            array[i] = initValue;
+        }
+        return array;
+    }
+
+    public static int[] initArray(int arraySize) {
+        return initArray(arraySize, 0);
+    }
+
+    public static boolean[] initBooleanArray(int arraySize, boolean initValue) {
+        boolean[] array = new boolean[arraySize];
+        for (int i = 0 ; i < array.length ; i++) {
+            array[i] = initValue;
+        }
+        return array;
+    }
+
+    public static boolean[] initBooleanArray(int arraySize) {
+        return initBooleanArray(arraySize, true);
+    }
+
     public static int[][] initStateSpaceMatrix(int colorSize, int positionSize) {
         int[][] stateSpaceMat = new int[colorSize][positionSize];
         for (int i = 0 ; i < stateSpaceMat.length ; i++) {
@@ -81,5 +105,13 @@ public class MiscUtil {
             }
         }
         return stateSpaceMat;
+    }
+
+    public static int[] deepCopyArray(int[] orgArray) {
+        int[] copyArray = new int[orgArray.length];
+        for (int i = 0 ; i < orgArray.length ; i++) {
+            copyArray[i] = orgArray[i];
+        }
+        return copyArray;
     }
 }

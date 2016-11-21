@@ -10,10 +10,12 @@ import java.util.List;
 
 public abstract class Player {
     public static final String TYPE = "abstract";
+    public static final int UNSOLVED_VALUE = -1;
     protected final State goalState;
     protected int colorSize, positionSize, time, preStateIdx;
     protected List<State> stateList;
-    protected int[][] stateSpaceMat;
+    protected int[] solutionColorSizes, solvedColorSizes, solvedElements;
+    protected int[][] stateMatrix;
 
     public Player(State goalState) {
         this.goalState = goalState;
@@ -22,27 +24,53 @@ public abstract class Player {
         this.time = 0;
         this.preStateIdx = 0;
         this.stateList = new ArrayList<>();
-        this.stateSpaceMat = MiscUtil.initStateSpaceMatrix(this.colorSize, this.positionSize);
+        this.solutionColorSizes = MiscUtil.initArray(this.colorSize, Config.UNEXPLORED_VALUE);
+        this.solvedColorSizes = MiscUtil.initArray(this.colorSize);
+        this.solvedElements = MiscUtil.initArray(this.positionSize, UNSOLVED_VALUE);
+        this.stateMatrix = MiscUtil.initStateSpaceMatrix(this.colorSize, this.positionSize);
     }
 
-    protected boolean invalidateDomRow(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= this.stateSpaceMat.length) {
+    protected boolean invalidateDomColor(int whichColor) {
+        if (whichColor < 0 || whichColor >= this.stateMatrix.length) {
             return false;
         }
 
-        for (int i = 0 ; i < this.stateSpaceMat.length ; i++) {
-            this.stateSpaceMat[rowIndex][i] = Config.FIXED_NON_ANSWER_VALUE;
+        for (int i = 0 ; i < this.stateMatrix[0].length ; i++) {
+            if (this.stateMatrix[whichColor][i] != Config.FIXED_ANSWER_VALUE) {
+                this.stateMatrix[whichColor][i] = Config.FIXED_NON_ANSWER_VALUE;
+            }
         }
         return true;
     }
 
-    protected boolean invalidateDomColumn(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= this.stateSpaceMat[0].length) {
+    protected boolean invalidateDomPosition(int whichPosition) {
+        if (whichPosition < 0 || whichPosition >= this.stateMatrix[0].length) {
             return false;
         }
 
-        for (int i = 0 ; i < this.stateSpaceMat[0].length ; i++) {
-            this.stateSpaceMat[i][columnIndex] = Config.FIXED_NON_ANSWER_VALUE;
+        for (int i = 0 ; i < this.stateMatrix.length ; i++) {
+            if (this.stateMatrix[i][whichPosition] != Config.FIXED_ANSWER_VALUE) {
+                this.stateMatrix[i][whichPosition] = Config.FIXED_NON_ANSWER_VALUE;
+            }
+        }
+        return true;
+    }
+
+    protected boolean updateStateMatrix(int whichColor, int whichPos, int whichStatus) {
+        if (whichColor < 0 || whichColor >= this.stateMatrix.length || whichPos < 0 || whichPos >= this.stateMatrix[0].length) {
+            return false;
+        } else if (this.stateMatrix[whichColor][whichPos] == Config.FIXED_ANSWER_VALUE) {
+            return false;
+        }
+
+        this.stateMatrix[whichColor][whichPos] = whichStatus;
+        if(whichStatus == Config.FIXED_ANSWER_VALUE) {
+            invalidateDomPosition(whichPos);
+            this.solvedColorSizes[whichColor]++;
+            this.solvedElements[whichPos] = whichColor;
+            if (this.solvedColorSizes[whichColor] == this.solutionColorSizes[whichColor]) {
+                invalidateDomColor(whichColor);
+            }
         }
         return true;
     }
@@ -55,8 +83,10 @@ public abstract class Player {
             currentState.setPegs(GameMaster.evaluate(currentState, this.goalState));
             this.time++;
             this.stateList.add(currentState);
-            System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString());
+            this.preStateIdx = this.stateList.size() - 1;
+            System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString(this.stateMatrix));
             if (GameMaster.checkIfGoalState(currentState, this.positionSize)) {
+                System.out.println("GOAL!\t" + currentState.toString().toUpperCase());
                 break;
             }
         }

@@ -1,5 +1,6 @@
 package mastermind.game;
 
+import mastermind.ai.ColorFirstPlayer;
 import mastermind.ai.NaivePlayer;
 import mastermind.ai.Player;
 import org.apache.commons.cli.CommandLine;
@@ -31,7 +32,13 @@ public class GameMaster {
     public static void start(int colorSize, int positionSize, String methodType, int[] answerElements) {
         State goalState = (answerElements == null) ? MiscUtil.generateGoalState(colorSize, positionSize)
                 : new State(answerElements, colorSize);
-        Player player = new NaivePlayer(goalState);
+        System.out.println("Answer: " + goalState.toShortString(null));
+        Player player;
+        if (methodType.equals(ColorFirstPlayer.TYPE)) {
+            player = new ColorFirstPlayer(goalState);
+        } else {
+            player = new NaivePlayer(goalState);
+        }
         player.play();
     }
 

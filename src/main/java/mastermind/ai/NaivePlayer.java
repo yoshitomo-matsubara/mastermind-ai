@@ -3,7 +3,7 @@ package mastermind.ai;
 import mastermind.game.State;
 
 public class NaivePlayer extends Player{
-    public static final String TYPE = "n";
+    public static final String TYPE = "np";
 
     public NaivePlayer(State goalState) {
         super(goalState);
@@ -19,9 +19,8 @@ public class NaivePlayer extends Player{
             return new State(elements, this.colorSize);
         }
 
-        this.preStateIdx = this.stateList.size() - 1;
         State preState =  this.stateList.get(this.preStateIdx);
-        int[] elements = new int[preState.elements.length];
+        int[] elements = new int[this.positionSize];
         boolean carryFlag = true;
         for (int i = elements.length - 1; i >= 0; i--) {
             int n = (carryFlag) ? preState.elements[i] + 1 : preState.elements[i];
