@@ -21,15 +21,29 @@ public class State {
         }
     }
 
-    public String toString() {
+    public String toShortString(int[][] stateMatrix) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < this.elements.length; i++) {
             char c = (char) ('a' + this.elements[i]);
-            String str = (sb.length() == 0) ? String.valueOf(c) : "," + String.valueOf(c);
+            String color = String.valueOf(c);
+            if (stateMatrix != null && stateMatrix[this.elements[i]][i] == Config.FIXED_ANSWER_VALUE) {
+                color = color.toUpperCase();
+            }
+
+            String str = (sb.length() == 0) ? color : "," + color;
             sb.append(str);
         }
+        return sb.toString();
+    }
 
+    public String toString(int[][] stateMatrix) {
+        String stateString = toShortString(stateMatrix);
+        StringBuilder sb = new StringBuilder(stateString);
         sb.append("\t" + "Red: " + String.valueOf(this.pegs[0]) + ", White: " + String.valueOf(this.pegs[1]) + ", Empty: " + this.pegs[2]);
         return sb.toString();
+    }
+
+    public String toString() {
+        return toString(null);
     }
 }

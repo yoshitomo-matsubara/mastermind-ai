@@ -8,11 +8,14 @@ import mastermind.game.State;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public abstract class Player {
+    public static final String TYPE = "abstract";
+    public static final int UNSOLVED_VALUE = -1;
     protected final State goalState;
     protected int colorSize, positionSize, time, preStateIdx;
     protected List<State> stateList;
-    protected int[][] stateSpaceMat;
+    protected int[] solutionColorSizes, solvedColorSizes, solvedElements;
+    protected int[][] stateMatrix;
 
     public Player(State goalState) {
         this.goalState = goalState;
@@ -21,58 +24,58 @@ public class Player {
         this.time = 0;
         this.preStateIdx = 0;
         this.stateList = new ArrayList<>();
-        this.stateSpaceMat = MiscUtil.initStateSpaceMatrix(this.colorSize, this.positionSize);
+        this.solutionColorSizes = MiscUtil.initArray(this.colorSize, Config.UNEXPLORED_VALUE);
+        this.solvedColorSizes = MiscUtil.initArray(this.colorSize);
+        this.solvedElements = MiscUtil.initArray(this.positionSize, UNSOLVED_VALUE);
+        this.stateMatrix = MiscUtil.initStateSpaceMatrix(this.colorSize, this.positionSize);
     }
 
-    protected boolean invalidateDomRow(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= this.stateSpaceMat.length) {
+    protected boolean invalidateDomColor(int whichColor) {
+        if (whichColor < 0 || whichColor >= this.stateMatrix.length) {
             return false;
         }
 
-        for (int i = 0 ; i < this.stateSpaceMat.length ; i++) {
-            this.stateSpaceMat[rowIndex][i] = Config.FIXED_NON_ANSWER_VALUE;
+        for (int i = 0 ; i < this.stateMatrix[0].length ; i++) {
+            if (this.stateMatrix[whichColor][i] != Config.FIXED_ANSWER_VALUE) {
+                this.stateMatrix[whichColor][i] = Config.FIXED_NON_ANSWER_VALUE;
+            }
         }
         return true;
     }
 
-    protected boolean invalidateDomColumn(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= this.stateSpaceMat[0].length) {
+    protected boolean invalidateDomPosition(int whichPosition) {
+        if (whichPosition < 0 || whichPosition >= this.stateMatrix[0].length) {
             return false;
         }
 
-        for (int i = 0 ; i < this.stateSpaceMat[0].length ; i++) {
-            this.stateSpaceMat[i][columnIndex] = Config.FIXED_NON_ANSWER_VALUE;
+        for (int i = 0 ; i < this.stateMatrix.length ; i++) {
+            if (this.stateMatrix[i][whichPosition] != Config.FIXED_ANSWER_VALUE) {
+                this.stateMatrix[i][whichPosition] = Config.FIXED_NON_ANSWER_VALUE;
+            }
         }
         return true;
     }
 
-    protected State searchNaively() {
-        if (this.stateList.size() == 0) {
-            int[] elements = new int[this.positionSize];
-            for (int i = 0; i < elements.length; i++) {
-                elements[i] = 0;
-            }
-            return new State(elements, this.colorSize);
+    protected boolean updateStateMatrix(int whichColor, int whichPos, int whichStatus) {
+        if (whichColor < 0 || whichColor >= this.stateMatrix.length || whichPos < 0 || whichPos >= this.stateMatrix[0].length) {
+            return false;
+        } else if (this.stateMatrix[whichColor][whichPos] == Config.FIXED_ANSWER_VALUE) {
+            return false;
         }
 
-        this.preStateIdx = this.stateList.size() - 1;
-        State preState =  this.stateList.get(this.preStateIdx);
-        int[] elements = new int[preState.elements.length];
-        boolean carryFlag = true;
-        for (int i = elements.length - 1; i >= 0; i--) {
-            int n = (carryFlag) ? preState.elements[i] + 1 : preState.elements[i];
-            carryFlag = n >= this.colorSize;
-            if (carryFlag) {
-                n = 0;
+        this.stateMatrix[whichColor][whichPos] = whichStatus;
+        if(whichStatus == Config.FIXED_ANSWER_VALUE) {
+            invalidateDomPosition(whichPos);
+            this.solvedColorSizes[whichColor]++;
+            this.solvedElements[whichPos] = whichColor;
+            if (this.solvedColorSizes[whichColor] == this.solutionColorSizes[whichColor]) {
+                invalidateDomColor(whichColor);
             }
-            elements[i] = n;
         }
-        return new State(elements, this.colorSize);
+        return true;
     }
 
-    protected State search() {
-        return searchNaively();
-    }
+    protected abstract State search();
 
     public void play() {
         while (true) {
@@ -80,8 +83,10 @@ public class Player {
             currentState.setPegs(GameMaster.evaluate(currentState, this.goalState));
             this.time++;
             this.stateList.add(currentState);
-            System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString());
+            this.preStateIdx = this.stateList.size() - 1;
+            System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString(this.stateMatrix));
             if (GameMaster.checkIfGoalState(currentState, this.positionSize)) {
+                System.out.println("GOAL!\t" + currentState.toString().toUpperCase());
                 break;
             }
         }
