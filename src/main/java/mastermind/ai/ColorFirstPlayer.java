@@ -5,7 +5,6 @@ import mastermind.game.MiscUtil;
 import mastermind.game.State;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,33 +41,22 @@ public class ColorFirstPlayer extends Player{
         return this.stateList.get(this.preStateIdx - back);
     }
 
-    private State handleSpecialCase(int[] elements) {
-        int unsolvedIdx = -1;
-        int unsolvedColor = -1;
-        for (int i = 0 ; i < this.stateMatrix[0].length ; i++) {
-            for (int j = 0 ; j < this.stateMatrix.length ; j++) {
-                if (this.solvedElements[i] == UNSOLVED_VALUE && this.stateMatrix[j][i] == Config.UNEXPLORED_VALUE) {
-                    unsolvedIdx = i;
-                    unsolvedColor = j;
-                    break;
-                }
-            }
-        }
-
-        for (int i = 0 ; i < this.stateMatrix[0].length ; i++) {
-            if (this.solvedElements[i] != UNSOLVED_VALUE && elements[i] != this.solvedElements[i] && elements[i] == unsolvedColor) {
-                int tmp = elements[unsolvedIdx];
-                elements[unsolvedIdx] = elements[i];
-                elements[i] = tmp;
+    private State backtrackReplace(State preState, int whichPosY, int value) {
+        int[] elements = MiscUtil.deepCopyArray(preState.elements);
+        elements[whichPosY] = value;
+        for (int i = 0 ; i < elements.length ; i++) {
+            if (this.solvedElements[i] == UNSOLVED_VALUE && elements[i] == value) {
+                elements[i] = this.orgValue;
                 break;
             }
         }
 
         this.mode = BACKTRACK_MODE;
+        this.orgValue = -1;
         return new State(elements, this.colorSize);
     }
 
-    private int buildColorListMap(int[] elements, int min, HashMap<Integer, List<Integer>> colorListMap) {
+    private int buildColorListMap(int[] elements, HashMap<Integer, List<Integer>> colorListMap) {
         List<Integer> positionList = new ArrayList<>();
         for (int i = 0 ; i < elements.length ; i++) {
             if (this.stateMatrix[elements[i]][i] != Config.FIXED_ANSWER_VALUE) {
@@ -89,7 +77,7 @@ public class ColorFirstPlayer extends Player{
             }
 
             colorListMap.put(position, colorList);
-            if (colorList.size() < minOption && colorList.size() > min) {
+            if (colorList.size() < minOption && colorList.size() > 0) {
                 minOption = colorList.size();
                 mcPositionKey = position;
             }
@@ -97,8 +85,28 @@ public class ColorFirstPlayer extends Player{
         return mcPositionKey;
     }
 
-    private int buildColorListMap(int[] elements, HashMap<Integer, List<Integer>> colorListMap) {
-        return buildColorListMap(elements, 1, colorListMap);
+    private State handleSpecialCase(int[] elements) {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0 ; i < this.solvedElements.length ; i++) {
+            if (this.solvedElements[i] != elements[i]) {
+                list.add(i);
+            }
+        }
+
+        int posA = list.get(0);
+        int posB = -1;
+        for (int i = 1 ; i < list.size() ; i++) {
+            posB = list.get(i);
+            if (elements[posB] != elements[posA]) {
+                break;
+            }
+        }
+
+        int tmp = elements[posA];
+        elements[posA] = elements[posB];
+        elements[posB] = tmp;
+        this.mode = BACKTRACK_MODE;
+        return new State(elements, this.colorSize);
     }
 
     private State switchBalls(int[] elements) {
@@ -109,26 +117,7 @@ public class ColorFirstPlayer extends Player{
         int shuffleIdxX = mcPositionKey;
         if (shuffleIdxX == -1) {
             colorListMap.clear();
-            shuffleIdxX = buildColorListMap(elements, 0, colorListMap);
-        }
-
-        if (shuffleIdxX == -1) {
-            List<Integer> list = new ArrayList<>();
-            for (int i = 0 ; i < this.solvedElements.length ; i++) {
-                if (this.solvedElements[i] == UNSOLVED_VALUE) {
-                    list.add(i);
-                }
-            }
-
-            if (list.size() != 2) {
-                return handleSpecialCase(elements);
-            }
-
-            int tmp = elements[list.get(0)];
-            elements[list.get(0)] = elements[list.get(1)];
-            elements[list.get(1)] = tmp;
-            this.mode = BACKTRACK_MODE;
-            return new State(elements, this.colorSize);
+            shuffleIdxX = buildColorListMap(elements, colorListMap);
         }
 
         int colorX = elements[shuffleIdxX];
@@ -147,6 +136,10 @@ public class ColorFirstPlayer extends Player{
                 shuffleIdxY = positionKey;
                 break;
             }
+        }
+
+        if (shuffleIdxY == -1) {
+            return handleSpecialCase(elements);
         }
 
         elements[shuffleIdxX] = colorY;
@@ -219,33 +212,11 @@ public class ColorFirstPlayer extends Player{
             } else if (redPegDiff == -1) {
                 updateStateMatrix(this.orgValue, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(this.orgValue, whichPosY, Config.FIXED_ANSWER_VALUE);
-                int[] elements = MiscUtil.deepCopyArray(preState.elements);
-                elements[whichPosY] = this.orgValue;
-                for (int i = 0 ; i < elements.length ; i++) {
-                    if (this.solvedElements[i] == UNSOLVED_VALUE && elements[i] == this.orgValue) {
-                        elements[i] = this.orgValue;
-                        break;
-                    }
-                }
-
-                this.mode = BACKTRACK_MODE;
-                this.orgValue = -1;
-                return new State(elements, this.colorSize);
+                return backtrackReplace(preState, whichPosY, this.orgValue);
             } else if (redPegDiff == 1){
                 updateStateMatrix(whichColorY, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(whichColorY, whichPosY, Config.FIXED_ANSWER_VALUE);
-                int[] elements = MiscUtil.deepCopyArray(preState.elements);
-                elements[whichPosY] = whichColorY;
-                for (int i = 0 ; i < elements.length ; i++) {
-                    if (this.solvedElements[i] == UNSOLVED_VALUE && elements[i] == whichColorY) {
-                        elements[i] = this.orgValue;
-                        break;
-                    }
-                }
-
-                this.mode = BACKTRACK_MODE;
-                this.orgValue = -1;
-                return new State(elements, this.colorSize);
+                return backtrackReplace(preState, whichPosY, whichColorY);
             }
             return backtrack(2);
         } else if (this.mode == BACKTRACK_MODE) {
@@ -260,10 +231,6 @@ public class ColorFirstPlayer extends Player{
             } else if (redPegDiff == 2) {
                 updateStateMatrix(whichColorX, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(whichColorY, whichPosY, Config.FIXED_ANSWER_VALUE);
-                int[] elements = MiscUtil.deepCopyArray(preState.elements);
-                if (this.positionSize - preState.pegs[0] <= 2) {
-                    return handleSpecialCase(elements);
-                }
             } else if (redPegDiff == 0) {
                 this.candidates = MiscUtil.deepCopyArray(preState.elements);
                 this.orgValue = whichColorX;
