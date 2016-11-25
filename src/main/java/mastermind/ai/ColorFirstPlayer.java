@@ -38,7 +38,10 @@ public class ColorFirstPlayer extends Player{
     private State backtrack(int back) {
         this.orgValue = -1;
         this.mode = BACKTRACK_MODE;
-        return this.stateList.get(this.preStateIdx - back);
+        State currentState = this.stateList.get(this.preStateIdx - back);
+        this.stateList.add(currentState);
+        this.preStateIdx = this.stateList.size() - 1;
+        return shuffle(currentState);
     }
 
     private State backtrackReplace(State preState, int whichPosY, int value) {
@@ -68,7 +71,7 @@ public class ColorFirstPlayer extends Player{
         int minOption = Integer.MAX_VALUE;
         int mcPositionKey = -1;
         for (int position : positionList) {
-            List<Integer> colorList = new ArrayList<Integer>();
+            List<Integer> colorList = new ArrayList<>();
             for (int i = 0 ; i < this.stateMatrix.length ; i++) {
                 int value = this.stateMatrix[i][position];
                 if (value != Config.FIXED_NON_ANSWER_VALUE && value != Config.FIXED_ANSWER_VALUE) {
