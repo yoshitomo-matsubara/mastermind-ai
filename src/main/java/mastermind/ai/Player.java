@@ -84,10 +84,11 @@ public abstract class Player {
             this.time++;
             this.stateList.add(currentState);
             this.preStateIdx = this.stateList.size() - 1;
-            System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString(this.stateMatrix));
             if (GameMaster.checkIfGoalState(currentState, this.positionSize)) {
-                System.out.println("GOAL!\t" + currentState.toString().toUpperCase());
+                System.out.println("GOAL! " + String.valueOf(this.time) + "\t" + currentState.toString().toUpperCase());
                 break;
+            } else {
+                System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString(this.stateMatrix));
             }
         }
     }
