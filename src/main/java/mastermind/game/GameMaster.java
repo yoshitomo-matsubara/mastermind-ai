@@ -32,7 +32,7 @@ public class GameMaster {
     public static void start(int colorSize, int positionSize, String methodType, int[] answerElements) {
         State goalState = (answerElements == null) ? MiscUtil.generateGoalState(colorSize, positionSize)
                 : new State(answerElements, colorSize);
-        System.out.println("Answer: " + goalState.toShortString(null));
+        System.out.println("Answer: \t" + goalState.toShortString(null));
         Player player;
         if (methodType.equals(ColorFirstPlayer.TYPE)) {
             player = new ColorFirstPlayer(goalState);

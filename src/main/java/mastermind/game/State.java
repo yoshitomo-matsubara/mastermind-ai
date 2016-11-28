@@ -26,7 +26,7 @@ public class State {
         for (int i = 0; i < this.elements.length; i++) {
             char c = (char) ('a' + this.elements[i]);
             String color = String.valueOf(c);
-            if (stateMatrix != null && stateMatrix[this.elements[i]][i] == Config.FIXED_ANSWER_VALUE) {
+            if (stateMatrix == null || stateMatrix[this.elements[i]][i] == Config.FIXED_ANSWER_VALUE) {
                 color = color.toUpperCase();
             }
 
