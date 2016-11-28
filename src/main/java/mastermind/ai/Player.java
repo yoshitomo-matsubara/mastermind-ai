@@ -78,6 +78,7 @@ public abstract class Player {
     protected abstract State search();
 
     public void play() {
+        long startTime = System.nanoTime();
         while (true) {
             State currentState = search();
             currentState.setPegs(GameMaster.evaluate(currentState, this.goalState));
@@ -85,7 +86,11 @@ public abstract class Player {
             this.stateList.add(currentState);
             this.preStateIdx = this.stateList.size() - 1;
             if (GameMaster.checkIfGoalState(currentState, this.positionSize)) {
+                long exeTime = System.nanoTime() - startTime;
                 System.out.println("GOAL! " + String.valueOf(this.time) + "\t" + currentState.toString().toUpperCase());
+                System.out.println();
+                System.out.println("Performance Measurement");
+                System.out.println("Guess:\t" + String.valueOf(this.time) + "\tTime[ns]:\t" + String.valueOf(exeTime));
                 break;
             } else {
                 System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString(this.stateMatrix));
