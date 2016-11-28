@@ -39,16 +39,37 @@ public class ColorFirstPlayer extends Player{
         this.orgValue = -1;
         this.mode = BACKTRACK_MODE;
         State currentState = this.stateList.get(this.preStateIdx - back);
-        this.stateList.add(currentState);
+        for (int i = 0 ; i < back ; i++) {
+            this.stateList.add(currentState);
+        }
+
         this.preStateIdx = this.stateList.size() - 1;
         return shuffle(currentState);
     }
 
-    private State backtrackReplace(State preState, int whichPosY, int value) {
+    private State backwardSwitch(State preState, int whichPosX, int whichColorX, int whichPosY) {
         int[] elements = MiscUtil.deepCopyArray(preState.elements);
-        elements[whichPosY] = value;
+        int tmp = elements[whichPosY];
+        elements[whichPosX] = whichColorX;
+        elements[whichPosY] = this.orgValue;
         for (int i = 0 ; i < elements.length ; i++) {
-            if (this.solvedElements[i] == UNSOLVED_VALUE && elements[i] == value) {
+            if (i != whichPosX && i != whichPosY && elements[i] == this.orgValue && this.solvedElements[i] == UNSOLVED_VALUE
+                    && this.stateMatrix[tmp][i] != Config.FIXED_NON_ANSWER_VALUE) {
+                elements[i] = tmp;
+                break;
+            }
+        }
+
+        this.mode = BACKTRACK_MODE;
+        this.orgValue = -1;
+        return new State(elements, this.colorSize);
+    }
+
+    private State forwardSwitch(State preState, int whichPosX, int whichPosY, int whichColorY) {
+        int[] elements = MiscUtil.deepCopyArray(preState.elements);
+        for (int i = 0 ; i < elements.length ; i++) {
+            if (i != whichPosX && i != whichPosY && elements[i] == whichColorY && this.solvedElements[i] == UNSOLVED_VALUE
+                    && this.stateMatrix[this.orgValue][i] != Config.FIXED_NON_ANSWER_VALUE) {
                 elements[i] = this.orgValue;
                 break;
             }
@@ -88,30 +109,6 @@ public class ColorFirstPlayer extends Player{
         return mcPositionKey;
     }
 
-    private State handleSpecialCase(int[] elements) {
-        List<Integer> list = new ArrayList<>();
-        for (int i = 0 ; i < this.solvedElements.length ; i++) {
-            if (this.solvedElements[i] != elements[i]) {
-                list.add(i);
-            }
-        }
-
-        int posA = list.get(0);
-        int posB = -1;
-        for (int i = 1 ; i < list.size() ; i++) {
-            posB = list.get(i);
-            if (elements[posB] != elements[posA]) {
-                break;
-            }
-        }
-
-        int tmp = elements[posA];
-        elements[posA] = elements[posB];
-        elements[posB] = tmp;
-        this.mode = BACKTRACK_MODE;
-        return new State(elements, this.colorSize);
-    }
-
     private State switchBalls(int[] elements) {
         // Key: position, Value: candidate color list
         HashMap<Integer, List<Integer>> colorListMap = new HashMap<>();
@@ -139,10 +136,6 @@ public class ColorFirstPlayer extends Player{
                 shuffleIdxY = positionKey;
                 break;
             }
-        }
-
-        if (shuffleIdxY == -1) {
-            return handleSpecialCase(elements);
         }
 
         elements[shuffleIdxX] = colorY;
@@ -215,11 +208,11 @@ public class ColorFirstPlayer extends Player{
             } else if (redPegDiff == -1) {
                 updateStateMatrix(this.orgValue, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(this.orgValue, whichPosY, Config.FIXED_ANSWER_VALUE);
-                return backtrackReplace(preState, whichPosY, this.orgValue);
+                return backwardSwitch(preState, whichPosX, this.orgValue, whichPosY);
             } else if (redPegDiff == 1){
                 updateStateMatrix(whichColorY, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(whichColorY, whichPosY, Config.FIXED_ANSWER_VALUE);
-                return backtrackReplace(preState, whichPosY, whichColorY);
+                return forwardSwitch(preState, whichPosX, whichPosY, whichColorY);
             }
             return backtrack(2);
         } else if (this.mode == BACKTRACK_MODE) {

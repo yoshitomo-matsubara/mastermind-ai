@@ -87,13 +87,13 @@ public abstract class Player {
             this.preStateIdx = this.stateList.size() - 1;
             if (GameMaster.checkIfGoalState(currentState, this.positionSize)) {
                 long exeTime = System.nanoTime() - startTime;
-                System.out.println("GOAL! " + String.valueOf(this.time) + "\t" + currentState.toString().toUpperCase());
+                System.out.println("GOAL! " + String.valueOf(this.time) + " \t" + currentState.toString().toUpperCase());
                 System.out.println();
                 System.out.println("Performance Measurement");
                 System.out.println("Guess:\t" + String.valueOf(this.time) + "\tTime[ns]:\t" + String.valueOf(exeTime));
                 break;
             } else {
-                System.out.println("Round " + String.valueOf(this.time) + "\t" + currentState.toString(this.stateMatrix));
+                System.out.println("Round " + String.valueOf(this.time) + " \t" + currentState.toString(this.stateMatrix));
             }
         }
     }
