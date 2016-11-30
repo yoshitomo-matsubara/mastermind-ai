@@ -25,7 +25,7 @@ public class ColorFirstPlayer extends Player{
         this.shuffleFreq = 0;
         this.mode = NORMAL_MODE;
         this.orgValue = -1;
-        this.candidates = new int[]{-1, -1};
+        this.candidates = new int[1];
         this.shuffledIdxs = new int[]{-1, -1};
     }
 
@@ -47,7 +47,7 @@ public class ColorFirstPlayer extends Player{
         return shuffle(currentState);
     }
 
-    private State backwardSwitch(State preState, int whichPosX, int whichColorX, int whichPosY) {
+    private State backwardShuffle(State preState, int whichPosX, int whichColorX, int whichPosY) {
         int[] elements = MiscUtil.deepCopyArray(preState.elements);
         int tmp = elements[whichPosY];
         elements[whichPosX] = whichColorX;
@@ -65,7 +65,7 @@ public class ColorFirstPlayer extends Player{
         return new State(elements, this.colorSize);
     }
 
-    private State forwardSwitch(State preState, int whichPosX, int whichPosY, int whichColorY) {
+    private State forwardShuffle(State preState, int whichPosX, int whichPosY, int whichColorY) {
         int[] elements = MiscUtil.deepCopyArray(preState.elements);
         for (int i = 0 ; i < elements.length ; i++) {
             if (i != whichPosX && i != whichPosY && elements[i] == whichColorY && this.solvedElements[i] == UNSOLVED_VALUE
@@ -109,7 +109,7 @@ public class ColorFirstPlayer extends Player{
         return mcPositionKey;
     }
 
-    private State switchBalls(int[] elements) {
+    private State swapBalls(int[] elements) {
         // Key: position, Value: candidate color list
         HashMap<Integer, List<Integer>> colorListMap = new HashMap<>();
         // most constrained position key
@@ -159,11 +159,8 @@ public class ColorFirstPlayer extends Player{
                     invalidateDomColor(i);
                 }
             }
-            int[] elements = MiscUtil.deepCopyArray(this.candidates);
-            return new State(elements, this.colorSize);
-        } else if (this.shuffleFreq == 2) {
             int[] elements = MiscUtil.deepCopyArray(preState.elements);
-            return switchBalls(elements);
+            return swapBalls(elements);
         }
 
         // understand pegs and reduce domains
@@ -208,11 +205,11 @@ public class ColorFirstPlayer extends Player{
             } else if (redPegDiff == -1) {
                 updateStateMatrix(this.orgValue, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(this.orgValue, whichPosY, Config.FIXED_ANSWER_VALUE);
-                return backwardSwitch(preState, whichPosX, this.orgValue, whichPosY);
+                return backwardShuffle(preState, whichPosX, this.orgValue, whichPosY);
             } else if (redPegDiff == 1){
                 updateStateMatrix(whichColorY, whichPosX, Config.FIXED_ANSWER_VALUE);
                 updateStateMatrix(whichColorY, whichPosY, Config.FIXED_ANSWER_VALUE);
-                return forwardSwitch(preState, whichPosX, whichPosY, whichColorY);
+                return forwardShuffle(preState, whichPosX, whichPosY, whichColorY);
             }
             return backtrack(2);
         } else if (this.mode == BACKTRACK_MODE) {
@@ -245,7 +242,7 @@ public class ColorFirstPlayer extends Player{
         }
 
         int[] elements = MiscUtil.deepCopyArray(preState.elements);
-        return switchBalls(elements);
+        return swapBalls(elements);
     }
 
     @Override
@@ -259,6 +256,11 @@ public class ColorFirstPlayer extends Player{
         State preState =  this.stateList.get(this.preStateIdx);
         if (this.colorIndex <= this.solutionColorSizes.length) {
             int pegSize = preState.pegs[0] + preState.pegs[1];
+            if (this.preStateIdx > 0) {
+                State prePreState = this.stateList.get(this.preStateIdx - 1);
+                pegSize -= (prePreState.pegs[0] + prePreState.pegs[1]);
+            }
+
             this.solutionColorSizes[this.colorIndex - 1] = pegSize;
             int totalPegSize = 0;
             for (int i = 0 ; i < this.colorIndex ; i++) {
@@ -280,6 +282,14 @@ public class ColorFirstPlayer extends Player{
 
             if (this.colorIndex < this.solutionColorSizes.length) {
                 int[] elements = MiscUtil.initArray(this.positionSize, this.colorIndex);
+                int index = 0;
+                for (int i = 0 ; i < this.solutionColorSizes.length ; i++) {
+                    for (int j = 0 ; j < this.solutionColorSizes[i] ; j++) {
+                        elements[index] = i;
+                        index++;
+                    }
+                }
+
                 this.colorIndex++;
                 return new State(elements, this.colorSize);
             }
