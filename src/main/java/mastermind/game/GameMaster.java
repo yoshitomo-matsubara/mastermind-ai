@@ -46,7 +46,7 @@ public class GameMaster {
         CommandLine cl = MiscUtil.setCommandLine(args);
         int colorSize = Integer.parseInt(cl.getOptionValue(Config.COLOR_SIZE_OPTION));
         int positionSize = Integer.parseInt(cl.getOptionValue(Config.POSITION_SIZE_OPTION));
-        String methodType = cl.hasOption(Config.METHOD_OPTION) ? cl.getOptionValue(Config.METHOD_OPTION) : null;
+        String methodType = cl.hasOption(Config.METHOD_OPTION) ? cl.getOptionValue(Config.METHOD_OPTION) : NaivePlayer.TYPE;
         int[] answerElements = cl.hasOption(Config.ANSWER_OPTION) ?
                 MiscUtil.convertToArray(cl.getOptionValue(Config.ANSWER_OPTION)) : null;
         if (colorSize < 1 || positionSize < 1) {
